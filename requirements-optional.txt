@@ -1,0 +1,5 @@
+# RemoteCLIP embedder (optional; weights must be staged + SHA-256 pinned under models/, see README section 3)
+torch>=1.13              # weights_only loading; NOT exercised in our build environment
+open_clip_torch>=2.20    # NOT exercised in our build environment
+# UI screenshot capture (scripts/screenshots.py); after install run: playwright install chromium
+playwright>=1.40         # tested 1.56.0

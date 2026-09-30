@@ -1,0 +1,11 @@
+# Exact versions for the Docker image (Linux x86-64, Python 3.12): the "tested" versions from requirements.txt.
+# Used as: pip install -r requirements.txt -c constraints-linux.txt
+numpy==2.4.4
+scipy==1.17.1
+opencv-python-headless==4.13.0.92
+rasterio==1.5.1
+faiss-cpu==1.15.1
+scikit-learn==1.8.0
+Pillow==12.1.1
+fastapi==0.141.1
+uvicorn==0.54.0

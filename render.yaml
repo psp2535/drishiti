@@ -1,0 +1,11 @@
+# Render Blueprint: public read-only demo built from the Dockerfile (Render dashboard -> New -> Blueprint).
+# Free plan: 512 MB RAM, sleeps after 15 min idle; the Dockerfile regenerates the simulated AOI at build time.
+services:
+  - type: web
+    name: drishti
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/stats
+    envVars:
+      - key: DRISHTI_READONLY
+        value: "1"

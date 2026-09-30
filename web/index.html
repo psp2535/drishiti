@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DRISHTI · Imagery search and change review</title>
+<style>
+:root{
+  --ink:#15232d; --ink2:#4a5b66; --ink3:#7d8b94; --line:#d5dde2; --canvas:#eef2f4; --panel:#ffffff;
+  --rail:#15232d; --accent:#0f6b6b; --accent-soft:#d8ecea; --warn:#b4541f; --bad:#a23b3b; --good:#1f7a4d;
+  --construction:#e5533b; --road:#e0a91d; --water_increase:#2f8fe0; --water_decrease:#7ccbe8; --clearance:#78b82a; --demolition:#b067d6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--canvas);color:var(--ink);font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,"Noto Sans",sans-serif;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer}
+.app{display:grid;grid-template-columns:208px 1fr;height:100vh}
+nav{background:var(--rail);color:#cfd9df;padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;font-size:20px;letter-spacing:.06em;color:#fff;padding:0 10px 2px}
+.brand small{display:block;font-weight:400;font-size:11.5px;letter-spacing:0;color:#8fa3ae;margin-top:2px}
+nav .sep{height:14px}
+nav button{all:unset;cursor:pointer;padding:9px 12px;border-radius:6px;color:#cfd9df}
+nav button:hover{background:#22343f}
+nav button.on{background:#e9f1f3;color:var(--ink);font-weight:600}
+nav .foot{margin-top:auto;font-size:12px;color:#8fa3ae;padding:0 10px;line-height:1.6}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3fbf7f;margin-right:6px;vertical-align:1px}
+main{overflow:auto;padding:20px 26px 40px}
+header.top{display:flex;align-items:baseline;gap:18px;margin-bottom:16px}
+header.top h1{font-size:22px;margin:0;font-weight:650}
+header.top .meta{color:var(--ink2);font-size:13px}
+.view{display:none}.view.on{display:block}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.row{display:flex;gap:16px}
+.qbar{display:flex;gap:10px;padding:14px;align-items:center}
+.qbar input[type=text]{flex:1;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;outline:none}
+.qbar input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:10px 16px;font-weight:600}
+.btn.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+.btn.good{background:var(--good)}.btn.bad{background:var(--bad)}
+.acts .btn{color:#fff;font-size:14px;padding:10px 0;border:0}.acts .btn.ghost{color:var(--accent);border:1px solid var(--accent);background:#fff}
+.filters{display:flex;gap:14px;padding:0 14px 12px;color:var(--ink2);font-size:13px;flex-wrap:wrap;align-items:center}
+.filters input,.filters select{border:1px solid var(--line);border-radius:5px;padding:5px 7px;font:inherit;color:var(--ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 14px}
+.chip{border:1px solid var(--line);background:#f7fafb;border-radius:14px;padding:4px 11px;font-size:12.5px;color:var(--ink2);cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.planbox{margin:12px 0;padding:10px 14px;font-size:13px;color:var(--ink2);display:flex;gap:18px;flex-wrap:wrap}
+.planbox b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.card img{width:100%;aspect-ratio:1;display:block;image-rendering:pixelated;background:#cfd8dc}
+.card .b{padding:9px 11px 11px;display:flex;flex-direction:column;gap:5px}
+.rank{position:absolute;top:8px;left:8px;background:rgba(21,35,45,.85);color:#fff;border-radius:4px;padding:1px 7px;font-weight:600;font-size:12px}
+.imgwrap{position:relative}
+.sc{font-weight:650}
+.small{font-size:12px;color:var(--ink2)}
+.why{font-size:11.5px;color:var(--ink2);background:#f3f6f7;border-radius:4px;padding:3px 6px}
+.acts{display:flex;gap:6px;margin-top:4px}
+.acts button{flex:1;border:1px solid var(--line);background:#fff;border-radius:5px;padding:5px 0;font-size:12px;color:var(--ink2)}
+.acts button.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.sensor{display:inline-block;font-size:11px;border-radius:3px;padding:0 5px;background:#e6ecef;color:var(--ink2)}
+.mapwrap{position:relative;width:640px;height:640px;flex:none;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:#cfd8dc}
+.mapwrap img{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.mapwrap svg{position:absolute;inset:0}
+.evlist{flex:1;min-width:360px;display:flex;flex-direction:column;gap:10px}
+.ev{padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:start}
+.ev.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.sw{width:12px;height:12px;border-radius:3px;margin-top:4px}
+.ev h4{margin:0;font-size:14.5px}
+.conf{font-weight:700;font-size:15px}
+.tag{font-size:11px;border-radius:3px;padding:1px 6px;margin-left:6px;background:#fbeee6;color:var(--warn);font-weight:600}
+.statline{display:flex;gap:26px;padding:12px 16px;margin-bottom:14px;align-items:baseline;flex-wrap:wrap}
+.statline .n{font-size:22px;font-weight:700}
+.statline .l{font-size:12px;color:var(--ink2)}
+/* evidence strip — the signature element */
+.strip{display:flex;gap:4px;margin-top:10px}
+.strip .d{flex:1;border-radius:4px;padding:6px 4px 5px;text-align:center;font-size:10.5px;line-height:1.25;border:1px solid var(--line);background:#f7fafb;color:var(--ink2)}
+.strip .d b{display:block;font-size:11px;color:var(--ink)}
+.strip .d.old{background:#eef3e9}
+.strip .d.new{background:#fde9e3}
+.strip .d.cloud{background:repeating-linear-gradient(45deg,#eef1f3,#eef1f3 4px,#dde3e7 4px,#dde3e7 8px);color:var(--ink3)}
+.strip .d.first{outline:2px solid var(--ink);outline-offset:1px}
+.review{display:grid;grid-template-columns:1fr 360px;gap:16px}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ba figure{margin:0}
+.ba img{width:100%;aspect-ratio:1;display:block;border-radius:6px;image-rendering:pixelated;border:1px solid var(--line)}
+.ba figcaption{font-size:12.5px;color:var(--ink2);margin-top:5px}
+table.kv{width:100%;border-collapse:collapse;font-size:13px}
+table.kv td{padding:5px 0;border-bottom:1px solid #edf1f3;vertical-align:top}
+table.kv td:first-child{color:var(--ink2);width:40%}
+.audit{font-size:12px;max-height:520px;overflow:auto}
+.audit div{padding:7px 0;border-bottom:1px solid #edf1f3}
+.hash{color:var(--ink3);font-size:11px;word-break:break-all}
+.pad{padding:14px 16px}
+h3{margin:0 0 10px;font-size:15px}
+.queue-list{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:14px}
+.queue-list .q{flex:none;width:150px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:7px 9px;cursor:pointer;font-size:12px}
+.queue-list .q.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+textarea{width:100%;border:1px solid var(--line);border-radius:6px;padding:8px;font:inherit;min-height:54px}
+.toast{position:fixed;bottom:18px;right:22px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:6px;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+table.t{width:100%;border-collapse:collapse;font-size:12.5px}
+table.t th{text-align:left;color:var(--ink2);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.t td{padding:6px 8px;border-bottom:1px solid #edf1f3}
+.seed{display:flex;gap:14px;align-items:center}
+.seed img{width:120px;height:120px;border-radius:6px;image-rendering:pixelated;border:2px solid var(--accent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav>
+    <div class="brand">DRISHTI<small>Archive search and change review</small></div>
+    <div class="sep"></div>
+    <button data-v="search" class="on">Search the archive</button>
+    <button data-v="change">Change analysis</button>
+    <button data-v="review">Review queue</button>
+    <button data-v="discover">Find similar sites</button>
+    <button data-v="system">Provenance and system</button>
+    <div class="foot" id="foot"><span class="dot"></span>Offline · no external calls</div>
+  </nav>
+  <main>
+    <header class="top"><h1 id="title">Search the archive</h1><span class="meta" id="meta"></span></header>
+
+    <section class="view on" id="v-search">
+      <div class="panel">
+        <div class="qbar">
+          <input type="text" id="q" value="newly built structures near a river" aria-label="Describe what you are looking for">
+          <button class="btn" id="go">Search</button>
+        </div>
+        <div class="filters">
+          <label>From <input type="date" id="f-from"></label>
+          <label>To <input type="date" id="f-to"></label>
+          <label>Sensor <select id="f-sensor"><option value="">Any</option></select></label>
+          <label>Min. usable <select id="f-usable"><option value="">Any</option><option value="0.5">50%</option><option value="0.8">80%</option></select></label>
+          <span id="fb-note"></span>
+        </div>
+        <div class="chips" id="examples"></div>
+      </div>
+      <div class="panel planbox" id="plan"></div>
+      <div class="grid" id="results"></div>
+    </section>
+
+    <section class="view" id="v-change">
+      <div class="panel statline" id="chstats"></div>
+      <div class="row">
+        <div class="mapwrap" id="map"><img id="mapimg" alt="Latest acquisition over the area of interest"><svg id="mapsvg" viewBox="0 0 640 640"></svg></div>
+        <div class="evlist" id="evlist"></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-review">
+      <div class="queue-list" id="qlist"></div>
+      <div class="review">
+        <div class="panel pad" id="rcard"></div>
+        <div class="panel pad"><h3>Audit trail</h3><div id="verify" class="small"></div><div class="audit" id="audit"></div></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-discover">
+      <div class="panel pad" id="seedbox"></div>
+      <div class="row" style="margin-top:14px">
+        <div class="mapwrap" id="dmap"><img id="dmapimg" alt="Acquisition used for discovery"><svg id="dsvg" viewBox="0 0 640 640"></svg></div>
+        <div style="flex:1;min-width:320px"><div class="grid" id="dres" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))"></div></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-system">
+      <div class="panel statline" id="sysstats"></div>
+      <div class="panel pad"><h3>Ingested acquisitions and processing history</h3><div style="overflow:auto"><table class="t" id="scenes"></table></div></div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const api=(u,b)=>fetch(u,b?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}:{}).then(r=>r.json());
+const TYPE={construction:'Construction',road:'Road development',water_increase:'Water extent increase',water_decrease:'Water extent decrease',clearance:'Vegetation clearance',demolition:'Structure removal'};
+const col=t=>getComputedStyle(document.documentElement).getPropertyValue('--'+t).trim()||'#888';
+const fmt=(x,d=2)=>x==null?'–':Number(x).toFixed(d);
+const ll=(lat,lon)=>`${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E`;
+let S={pos:new Set(),neg:new Set(),changes:[],sel:null,stats:null};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+const TITLES={search:'Search the archive',change:'Change analysis',review:'Review queue',discover:'Find similar sites',system:'Provenance and system'};
+function show(v){$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));$('#title').textContent=TITLES[v];
+  if(v==='change')loadChanges(); if(v==='review')loadQueue(); if(v==='system')loadSystem(); if(v==='discover'&&!S.seed)discover(null);}
+$$('nav button').forEach(b=>b.onclick=()=>show(b.dataset.v));
+
+async function init(){
+  const s=await api('/api/stats'); S.stats=s;
+  $('#meta').textContent=`${s.scenes} acquisitions · ${s.tiles} indexed tiles · ${s.area_km2} km² · ${s.date_range[0]} to ${s.date_range[1]}`;
+  $('#foot').innerHTML=`<span class="dot"></span>Offline · no external calls<br>Embedder: ${s.embedder}`;
+  s.sensors.forEach(x=>$('#f-sensor').insertAdjacentHTML('beforeend',`<option>${x}</option>`));
+  ['newly built structures near a river','new road','forest','dense settlement','water body','open ground'].forEach(e=>{
+    const c=document.createElement('span');c.className='chip';c.textContent=e;c.onclick=()=>{$('#q').value=e;S.pos.clear();S.neg.clear();search()};$('#examples').append(c)});
+  search();
+}
+function filters(){const f={};if($('#f-from').value)f.date_from=$('#f-from').value;if($('#f-to').value)f.date_to=$('#f-to').value;
+  if($('#f-sensor').value)f.sensors=[$('#f-sensor').value];if($('#f-usable').value)f.min_usable=+$('#f-usable').value;return Object.keys(f).length?f:null}
+async function search(){
+  const r=await api('/api/search/text',{query:$('#q').value,filters:filters(),k:12,positives:[...S.pos],negatives:[...S.neg]});
+  const p=r.plan;
+  $('#plan').innerHTML=`<span>Looking for <b>${p.subject}</b></span>`+(p.relation?`<span>near <b>${p.relation}</b></span>`:'')+
+    (p.temporal?`<span>that is <b>new</b> (joined with ${p.change_types.join(', ')||'any'} change events)</span>`:'')+
+    `<span>${r.results.length} locations from ${r.candidates} candidates in <b>${r.latency_ms} ms</b></span>`;
+  $('#fb-note').textContent=(S.pos.size||S.neg.size)?`Refined with ${S.pos.size} relevant / ${S.neg.size} not relevant`:'';
+  $('#results').innerHTML=r.results.length?'':'<div class="panel pad" style="grid-column:1/-1">No location matches all parts of this query. Try removing a condition, such as the date range.</div>';
+  r.results.forEach((t,i)=>{
+    const d=document.createElement('div');d.className='card';
+    d.innerHTML=`<div class="imgwrap"><img src="/img/tile/${t.tile_id}.png?size=212" alt="Tile ${t.row},${t.col}"><span class="rank">${i+1}</span></div>
+    <div class="b"><div><span class="sc">${fmt(t.score)}</span> <span class="small">· ${t.acq_time.slice(0,10)}</span> <span class="sensor">${t.sensor}</span></div>
+    <div class="small">${ll(t.lat,t.lon)} · tile ${t.row},${t.col}</div>
+    ${t.why.slice(1).map(w=>`<div class="why">${w}</div>`).join('')}
+    <div class="acts"><button data-a="pos" class="${S.pos.has(t.tile_id)?'on':''}">Relevant</button><button data-a="neg" class="${S.neg.has(t.tile_id)?'on':''}">Not relevant</button><button data-a="sim">Similar</button></div></div>`;
+    d.querySelector('[data-a=pos]').onclick=()=>{S.neg.delete(t.tile_id);S.pos.add(t.tile_id);search()};
+    d.querySelector('[data-a=neg]').onclick=()=>{S.pos.delete(t.tile_id);S.neg.add(t.tile_id);search()};
+    d.querySelector('[data-a=sim]').onclick=()=>{show('discover');discover(t.tile_id)};
+    $('#results').append(d)});
+}
+$('#go').onclick=()=>{S.pos.clear();S.neg.clear();search()};$('#q').onkeydown=e=>{if(e.key==='Enter')$('#go').onclick()};
+
+async function loadChanges(){
+  const [all,sc]=await Promise.all([api('/api/changes'),api('/api/scenes')]);S.changes=all;S.scenes=sc;
+  const ch=all.filter(c=>c.status!=='superseded'),nsup=all.length-ch.length;
+  const last=sc[sc.length-1];$('#mapimg').src=`/img/scene/${last.scene_id}.png`;
+  const st=S.lastRun||{};
+  $('#chstats').innerHTML=`<div><div class="n">${ch.length}</div><div class="l">active change events${nsup?` (${nsup} superseded by newer imagery)`:''}</div></div>
+   <div><div class="n">${ch.filter(c=>c.status==='pending').length}</div><div class="l">awaiting review</div></div>
+   <div><div class="n">${st.naive_flip_px?st.naive_flip_px.toLocaleString():'–'}</div><div class="l">pixels a naive date-to-date diff would flag</div></div>
+   <div><div class="n">${st.reported_px?st.reported_px.toLocaleString():'–'}</div><div class="l">pixels reported after quality + persistence checks</div></div>
+   <div style="margin-left:auto"><button class="btn ghost" id="rerun">Run analysis for full archive</button></div>`;
+  $('#rerun').onclick=async()=>{const r=await api('/api/change/run',{});S.lastRun=r.stats;toast(`Analysis complete: ${r.n} events`);loadChanges()};
+  const svg=$('#mapsvg');svg.innerHTML='';
+  ch.forEach(c=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.innerHTML=`<rect x="${c.c0-3}" y="${c.r0-3}" width="${c.c1-c.c0+6}" height="${c.r1-c.r0+6}" fill="none" stroke="${col(c.type)}" stroke-width="${S.sel===c.change_id?4:2.5}" rx="3"/>
+      <text x="${c.c0>470?c.c1:c.c0}" text-anchor="${c.c0>470?'end':'start'}" y="${c.r0<24?c.r1+18:c.r0-8}" font-size="13" font-weight="700" fill="#fff" stroke="#15232d" stroke-width="3" paint-order="stroke">${TYPE[c.type]||c.type}</text>`;
+    g.style.cursor='pointer';g.onclick=()=>selectChange(c.change_id);svg.append(g)});
+  $('#evlist').innerHTML='';
+  ch.forEach(c=>{const d=document.createElement('div');d.className='ev'+(S.sel===c.change_id?' sel':'');
+    d.innerHTML=`<span class="sw" style="background:${col(c.type)}"></span><div><h4>${TYPE[c.type]||c.type} · ${c.subtype}${c.provisional?'<span class="tag">Provisional</span>':''}</h4>
+    <div class="small">First seen ${c.earliest_obs} (last clear view of old state ${c.last_pre_obs}) · ${(c.area_m2/1e4).toFixed(2)} ha · ${ll(c.lat,c.lon)}</div>
+    ${S.sel===c.change_id?'<div class="strip" id="strip"></div>':''}</div>
+    <div style="text-align:right"><div class="conf">${fmt(c.confidence)}</div><div class="small">${c.status}</div></div>`;
+    d.onclick=()=>selectChange(c.change_id);$('#evlist').append(d)});
+  if(S.sel)drawStrip(S.sel,'#strip');
+}
+function selectChange(id){S.sel=id;loadChanges()}
+async function drawStrip(id,sel){
+  const c=S.changes.find(x=>x.change_id===id);const tl=await api('/api/timeline?change_id='+id);
+  const el=$(sel);if(!el)return;el.innerHTML=tl.map(t=>{
+    let cls=t.usable<0.5?'cloud':(t.date<c.earliest_obs?'old':'new');if(t.date===c.earliest_obs)cls+=' first';
+    return `<div class="d ${cls}" title="${t.scene_id}"><b>${t.date.slice(2,7).replace('-','/')}</b>${t.usable<0.5?'cloud':(t.post_share!=null?t.post_state+' '+Math.round(t.post_share*100)+'%':t.dominant)}</div>`}).join('');
+}
+
+async function loadQueue(pick){
+  const q=await api('/api/queue');const cur=pick||S.qsel||(q[0]&&q[0].change_id);S.qsel=cur;
+  $('#qlist').innerHTML='';
+  q.forEach(c=>{const d=document.createElement('div');d.className='q'+(c.change_id===cur?' sel':'');
+    d.innerHTML=`<div style="font-weight:600"><span class="sw" style="display:inline-block;background:${col(c.type)};margin-right:6px"></span>${TYPE[c.type]||c.type}</div><div class="small">rank ${fmt(c.rank_score)}${c.feedback_prob!=null?' · learned '+fmt(c.feedback_prob):''}</div>`;
+    d.onclick=()=>loadQueue(c.change_id);$('#qlist').append(d)});
+  const c=q.find(x=>x.change_id===cur);
+  if(!c){$('#rcard').innerHTML='<h3>Queue is clear</h3><p class="small">Every candidate has a decision. Run change analysis after the next acquisition is ingested.</p>';}
+  else{
+  const b=S.scenesById?S.scenesById:(S.scenesById=Object.fromEntries((await api('/api/scenes')).map(s=>[s.scene_id,s])));
+  const pb=b[c.before_scene],pa=b[c.after_scene],d=c.detail;
+  $('#rcard').innerHTML=`<h3>${TYPE[c.type]||c.type} · ${c.subtype}${c.provisional?'<span class="tag">Provisional: one supporting acquisition</span>':''}</h3>
+   <div class="ba"><figure><img src="/img/chip/${c.change_id}/before.png"><figcaption>Before · ${pb.acq_time.slice(0,10)} · ${pb.platform}</figcaption></figure>
+   <figure><img src="/img/chip/${c.change_id}/after.png"><figcaption>After · ${pa.acq_time.slice(0,10)} · ${pa.platform}</figcaption></figure></div>
+   <div class="strip" id="rstrip"></div>
+   <table class="kv" style="margin-top:12px">
+   <tr><td>Location</td><td>${ll(c.lat,c.lon)} · ${(c.area_m2/1e4).toFixed(2)} ha</td></tr>
+   <tr><td>Earliest usable observation</td><td>${c.earliest_obs}${d.cloud_skipped_dates.length?' (skipped cloudy '+d.cloud_skipped_dates.join(', ')+')':''}</td></tr>
+   <tr><td>Confidence</td><td>${fmt(c.confidence)} (persistence ${d.persistence_obs} acquisitions, usable ${Math.round(d.quality_frac*100)}%)</td></tr>
+   <tr><td>Evidence</td><td>${d.pre_state} → ${d.post_state}; NDVI ${fmt(d.evidence.ndvi_before)} → ${fmt(d.evidence.ndvi_after)}; MNDWI ${fmt(d.evidence.mndwi_before)} → ${fmt(d.evidence.mndwi_after)}</td></tr>
+   <tr><td>Source scenes</td><td>${pb.scene_id}<br>${pa.scene_id}</td></tr>
+   <tr><td>Processing</td><td>${(pa.processing.steps||[]).map(s=>s.step.replace('_',' ')).join(' → ')} (${pa.processing.pipeline})</td></tr></table>
+   <textarea id="note" placeholder="Note for the audit trail (optional)"></textarea>
+   <div class="acts" style="margin-top:10px"><button class="btn good" id="ok">Confirm change</button><button class="btn bad" id="no">Reject</button><button class="btn ghost" id="exp">Export confirmed (GeoJSON)</button></div>`;
+  S.changes=await api('/api/changes');drawStrip(c.change_id,'#rstrip');
+  $('#ok').onclick=()=>dec(c.change_id,'confirmed');$('#no').onclick=()=>dec(c.change_id,'rejected');
+  $('#exp').onclick=async()=>{const r=await api('/api/export',{});const u=URL.createObjectURL(new Blob([JSON.stringify(r,null,1)],{type:'application/geo+json'}));
+    const a=document.createElement('a');a.href=u;a.download='drishti_changes.geojson';a.click();toast(`Exported ${r.features.length} confirmed changes`)};}
+  loadAudit();
+}
+async function dec(id,d){await api('/api/decision',{change_id:id,decision:d,analyst:'analyst-01',note:$('#note').value});toast(d==='confirmed'?'Change confirmed':'Change rejected');S.qsel=null;loadQueue()}
+async function loadAudit(){const a=await api('/api/audit?limit=30');
+  $('#verify').innerHTML=a.verify.ok?`<span class="dot"></span>Hash chain intact · ${a.verify.checked} entries verified`:`Chain broken at entry ${a.verify.broken_at}`;
+  $('#audit').innerHTML=a.entries.map(e=>{const p=JSON.parse(e.payload);return `<div><b>${e.action}</b> · ${e.actor} · ${e.ts.replace('T',' ').slice(0,16)}<br>
+   <span class="small">${e.action==='DECISION'?p.decision+' '+p.change_id:e.action==='INGEST'?p.scene_id+' ('+p.tiles+' tiles)':e.action==='CHANGE_RUN'?p.events+' events, '+p.suppression_ratio*100+'% of raw flips suppressed':JSON.stringify(p).slice(0,80)}</span>
+   <div class="hash">${e.hash.slice(0,32)}…</div></div>`}).join('')}
+
+async function discover(tid){
+  const sc=await api('/api/scenes');const last=sc[sc.length-1];
+  if(tid==null){const r=await api('/api/search/text',{query:'dense settlement',k:1});tid=r.results[0].tile_id}
+  S.seed=tid;const r=await api('/api/search/image',{tile_id:tid,k:9});const seed=r.seed;
+  $('#dmapimg').src=`/img/scene/${seed.scene_id}.png`;
+  $('#seedbox').innerHTML=`<div class="seed"><img src="/img/tile/${tid}.png?size=120"><div><h3>Sites that look like this one</h3>
+    <div class="small">Seed: tile ${seed.row},${seed.col} · ${seed.acq_time.slice(0,10)} · ${ll(seed.lat,seed.lon)}</div>
+    <div class="small">${r.results.length} similar locations across the archive in ${r.latency_ms} ms. No new query needed: pick any result to search from it.</div></div></div>`;
+  const svg=$('#dsvg');svg.innerHTML=`<rect x="${seed.c0}" y="${seed.r0}" width="64" height="64" fill="rgba(15,107,107,.25)" stroke="#0f6b6b" stroke-width="3"/>`;
+  r.results.forEach((t,i)=>svg.insertAdjacentHTML('beforeend',`<rect x="${t.c0+2}" y="${t.r0+2}" width="60" height="60" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="5 3"/><text x="${t.c0+6}" y="${t.r0+18}" font-size="14" font-weight="700" fill="#fff" stroke="#15232d" stroke-width="3" paint-order="stroke">${i+1}</text>`));
+  $('#dres').innerHTML=r.results.map((t,i)=>`<div class="card" data-t="${t.tile_id}" style="cursor:pointer"><div class="imgwrap"><img src="/img/tile/${t.tile_id}.png?size=150"><span class="rank">${i+1}</span></div><div class="b"><span class="sc">${fmt(t.score)}</span><span class="small">${t.acq_time.slice(0,10)} · tile ${t.row},${t.col}</span></div></div>`).join('');
+  $$('#dres .card').forEach(c=>c.onclick=()=>discover(+c.dataset.t));
+}
+
+async function loadSystem(){
+  const s=await api('/api/stats');const sc=await api('/api/scenes');
+  $('#sysstats').innerHTML=`<div><div class="n">${s.scenes}</div><div class="l">acquisitions</div></div><div><div class="n">${s.tiles}</div><div class="l">indexed tiles</div></div>
+   <div><div class="n">${s.area_km2} km²</div><div class="l">indexed area</div></div><div><div class="n">${(s.storage_bytes/1048576).toFixed(1)} MB</div><div class="l">storage footprint</div></div>
+   <div><div class="n">${s.audit.checked}</div><div class="l">audit entries, chain ${s.audit.ok?'intact':'broken'}</div></div><div><div class="n">0</div><div class="l">external network calls</div></div>`;
+  $('#scenes').innerHTML=`<tr><th>Acquisition</th><th>Platform / sensor</th><th>Native res.</th><th>Usable</th><th>Co-registration shift (px)</th><th>Radiometric gain (B,G,R,NIR,SWIR)</th><th>SHA-256</th></tr>`+
+   sc.map(x=>`<tr><td>${x.acq_time.slice(0,10)}${x.is_reference?' (reference)':''}</td><td>${x.platform} · ${x.sensor}</td><td>${x.native_res_m} m</td><td>${Math.round(x.usable_frac*100)}%</td>
+   <td>${x.is_reference?'–':fmt(x.coreg_dy)+', '+fmt(x.coreg_dx)}</td><td>${x.norm_coefs?x.norm_coefs.map(c=>fmt(c[0])).join(', '):'–'}</td><td class="hash">${x.sha256.slice(0,20)}…</td></tr>`).join('');
+}
+init();
+</script>
+</body>
+</html>

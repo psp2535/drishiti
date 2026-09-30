@@ -1,0 +1,10 @@
+# DRISHTI core runtime (tested versions in comments; Python 3.10+, tested on 3.12.3)
+numpy>=1.24              # tested 2.4.4
+scipy>=1.10              # tested 1.17.1
+opencv-python-headless>=4.8   # tested 4.13.0.92 (co-registration warp)
+rasterio>=1.3            # tested 1.5.1 (bundles GDAL in the wheel)
+faiss-cpu>=1.7.4         # tested 1.15.1 (HNSW, IDSelectorBatch, SearchParametersHNSW)
+scikit-learn>=1.3        # tested 1.8.0 (HDBSCAN needs >= 1.3)
+Pillow>=10               # tested 12.1.1
+fastapi>=0.100           # tested 0.141.1
+uvicorn>=0.23            # tested 0.54.0

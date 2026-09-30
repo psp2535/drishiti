@@ -1,0 +1,65 @@
+[
+ {
+  "seed": 11,
+  "events": 5,
+  "object_precision": 1.0,
+  "object_recall": 1.0,
+  "type_accuracy": 1.0,
+  "earliest_obs_accuracy": 1.0,
+  "pixel_precision": 1.0,
+  "pixel_recall": 0.994,
+  "fa": {
+   "crop_seasonal": 0,
+   "haze": 0,
+   "cloud_or_shadow": 0
+  },
+  "naive_fa": {
+   "crop_seasonal": 341693,
+   "haze": 78295,
+   "cloud_or_shadow": 161765
+  },
+  "macro_p10": 1.0
+ },
+ {
+  "seed": 42,
+  "events": 5,
+  "object_precision": 1.0,
+  "object_recall": 1.0,
+  "type_accuracy": 1.0,
+  "earliest_obs_accuracy": 1.0,
+  "pixel_precision": 1.0,
+  "pixel_recall": 0.998,
+  "fa": {
+   "crop_seasonal": 0,
+   "haze": 0,
+   "cloud_or_shadow": 0
+  },
+  "naive_fa": {
+   "crop_seasonal": 334694,
+   "haze": 77716,
+   "cloud_or_shadow": 162663
+  },
+  "macro_p10": 1.0
+ },
+ {
+  "seed": 7,
+  "events": 5,
+  "object_precision": 1.0,
+  "object_recall": 1.0,
+  "type_accuracy": 1.0,
+  "earliest_obs_accuracy": 1.0,
+  "pixel_precision": 1.0,
+  "pixel_recall": 0.997,
+  "fa": {
+   "crop_seasonal": 0,
+   "haze": 0,
+   "cloud_or_shadow": 0
+  },
+  "naive_fa": {
+   "crop_seasonal": 332434,
+   "haze": 78798,
+   "cloud_or_shadow": 162267
+  },
+  "macro_p10": 1.0
+ }
+]

@@ -1,0 +1,7 @@
+.venv/
+data/
+wheels/
+__pycache__/
+*.pyc
+models/*.pt
+models/*.sha256

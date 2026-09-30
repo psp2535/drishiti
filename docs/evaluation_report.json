@@ -1,0 +1,231 @@
+{
+  "hardware": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "logical_cores": 1,
+    "ram_gb": 3.9,
+    "gpu": "none (CPU only)",
+    "os": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "faiss": "1.15.1",
+    "rasterio": "1.5.1"
+  },
+  "embedder": "drishti-lite-spectral-v1",
+  "dataset": {
+    "source": "synthetic AOI (seeded, see make_synthetic_aoi.py)",
+    "crs": "EPSG:32644",
+    "res_m": 10.0,
+    "confounders_injected": [
+      "cloud@2024-07-20",
+      "shadow@2024-07-20",
+      "haze@2024-10-25",
+      "radiometric_gain@2025-01-12",
+      "misregistration_px@2025-04-15",
+      "cloud@2025-07-18",
+      "shadow@2025-07-18"
+    ]
+  },
+  "index": {
+    "scenes": 8,
+    "tiles": 800,
+    "tile_px": 64,
+    "tile_m": 640.0,
+    "area_km2": 40.96,
+    "build_seconds_first_n_minus_1": 5.77,
+    "incremental_ingest_seconds": 1.06,
+    "tiles_before_incremental": 700,
+    "tiles_after_incremental": 800,
+    "full_rebuild": false,
+    "reingest_same_file_skipped": true
+  },
+  "change": {
+    "window": [
+      "2024-01-15",
+      "2025-10-22"
+    ],
+    "seconds": 1.32,
+    "events": 5,
+    "object_precision": 1.0,
+    "object_recall": 1.0,
+    "type_accuracy": 1.0,
+    "earliest_obs_accuracy": 1.0,
+    "expected_earliest": {
+      "C1": "2024-10-25",
+      "C2": "2025-01-12",
+      "C3": "2025-04-15",
+      "C4": "2025-04-15",
+      "C5": "2025-10-22"
+    },
+    "pixel_precision": 1.0,
+    "pixel_recall": 0.993,
+    "false_alarm_px_in_confounder_zones": {
+      "crop_seasonal": 0,
+      "haze": 0,
+      "cloud_or_shadow": 0
+    },
+    "naive_baseline": {
+      "objects": 17,
+      "true_objects": 1,
+      "object_precision": 0.059,
+      "false_alarm_px_in_confounder_zones": {
+        "crop_seasonal": 336523,
+        "haze": 75914,
+        "cloud_or_shadow": 171279
+      }
+    },
+    "suppression_ratio_vs_raw_flips": 0.9819,
+    "raw_state_flip_px": 351475,
+    "reported_px": 6362,
+    "per_event": [
+      {
+        "event": "a2e11327708a",
+        "type": "water_increase",
+        "subtype": "expansion",
+        "conf": 0.987,
+        "provisional": false,
+        "earliest": "2025-04-15",
+        "gt": "C3",
+        "gt_type": "water_increase",
+        "type_ok": true,
+        "earliest_ok": true
+      },
+      {
+        "event": "3d138428ce71",
+        "type": "clearance",
+        "subtype": "contraction",
+        "conf": 0.977,
+        "provisional": false,
+        "earliest": "2025-01-12",
+        "gt": "C2",
+        "gt_type": "clearance",
+        "type_ok": true,
+        "earliest_ok": true
+      },
+      {
+        "event": "a3058acc3e13",
+        "type": "road",
+        "subtype": "appearance",
+        "conf": 0.969,
+        "provisional": false,
+        "earliest": "2025-04-15",
+        "gt": "C4",
+        "gt_type": "road",
+        "type_ok": true,
+        "earliest_ok": true
+      },
+      {
+        "event": "db39e32d0416",
+        "type": "construction",
+        "subtype": "appearance",
+        "conf": 0.958,
+        "provisional": false,
+        "earliest": "2024-10-25",
+        "gt": "C1",
+        "gt_type": "construction",
+        "type_ok": true,
+        "earliest_ok": true
+      },
+      {
+        "event": "357b48042bac",
+        "type": "construction",
+        "subtype": "expansion",
+        "conf": 0.598,
+        "provisional": true,
+        "earliest": "2025-10-22",
+        "gt": "C5",
+        "gt_type": "construction",
+        "type_ok": true,
+        "earliest_ok": true
+      }
+    ]
+  },
+  "retrieval": {
+    "queries": {
+      "river": {
+        "relevant_locations": 12,
+        "returned": 10,
+        "p_at_5": 1.0,
+        "p_at_10": 1.0,
+        "ndcg_at_10": 1.0
+      },
+      "water body": {
+        "relevant_locations": 12,
+        "returned": 10,
+        "p_at_5": 1.0,
+        "p_at_10": 1.0,
+        "ndcg_at_10": 1.0
+      },
+      "dense settlement": {
+        "relevant_locations": 5,
+        "returned": 10,
+        "p_at_5": 1.0,
+        "p_at_10": 1.0,
+        "ndcg_at_10": 1.0
+      },
+      "forest": {
+        "relevant_locations": 6,
+        "returned": 10,
+        "p_at_5": 1.0,
+        "p_at_10": 1.0,
+        "ndcg_at_10": 1.0
+      },
+      "open ground": {
+        "relevant_locations": 89,
+        "returned": 10,
+        "p_at_5": 1.0,
+        "p_at_10": 1.0,
+        "ndcg_at_10": 1.0
+      },
+      "newly built structures near a river": {
+        "relevant_locations": 2,
+        "returned": 2,
+        "p_at_5": 1.0,
+        "p_at_10": 1.0,
+        "ndcg_at_10": 1.0
+      },
+      "new road": {
+        "relevant_locations": 3,
+        "returned": 4,
+        "p_at_5": 1.0,
+        "p_at_10": 1.0,
+        "ndcg_at_10": 1.0
+      },
+      "image\u2192image (settlement seed)": {
+        "relevant_locations": 5,
+        "returned": 10,
+        "p_at_5": 1.0,
+        "p_at_10": 1.0,
+        "ndcg_at_10": 1.0
+      }
+    },
+    "macro_p_at_10": 1.0,
+    "note": "relevance judged from ground-truth land cover / change masks never seen by the system"
+  },
+  "latency_ms": {
+    "text_query_end_to_end_p50": 5.41,
+    "text_query_end_to_end_p95": 30.94,
+    "ann_only_p50": 0.048,
+    "ann_only_p95": 0.097
+  },
+  "storage": {
+    "total_mb": 21.79,
+    "files": {
+      "index.hnsw.faiss": 390031,
+      "cache/": 22079001,
+      "vectors.f32": 166400,
+      "drishti.sqlite": 217088
+    },
+    "bytes_per_tile_index_and_vectors": 695
+  },
+  "scale_benchmark": {
+    "vectors": 100000,
+    "dim": 512,
+    "index": "HNSW M=32 efC=80 efS=128",
+    "build_seconds": 29.3,
+    "incremental_add_10pct_seconds": 5.0,
+    "recall_at_10": 0.916,
+    "query_p50_ms": 0.53,
+    "query_p95_ms": 0.87,
+    "index_mb": 222.0,
+    "note": "index-only; tiles at 256 px/10 m: 100k tiles \u2248 655,000 km\u00b2 of Sentinel-2 coverage per date"
+  }
+}
